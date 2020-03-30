@@ -61,6 +61,7 @@ public class serviceExtendedClass extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.i("Info", "Got to service!!");
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
 
@@ -77,7 +78,6 @@ public class serviceExtendedClass extends Service {
 
 
         Toast.makeText(this, "Hi there", Toast.LENGTH_SHORT).show();
-        Log.i("Info", "Got to service!!");
 
         messageListener = new MessageListener() {
             @Override

@@ -1,20 +1,11 @@
 package com.example.locationtestproject;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Application;
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.MediaPlayer;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,29 +13,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
 
-import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.messages.Message;
-import com.google.android.gms.nearby.messages.MessageListener;
-
-import java.security.Permission;
 
 public class MainActivity extends AppCompatActivity {
 
     final int FREQUENT_UDPATES = 1000;
     final int BATTERY_SAVER = 5000;
     Boolean boolCautious = true;
-    Location lastLoc;
-    LocationManager locationManager;
-    Message mActiveMessage;
-    Notification notification;
 
     Activity masterClass = this;
 
@@ -59,11 +38,11 @@ public class MainActivity extends AppCompatActivity {
     *
     * */
     public void startBroadcast(View view){
-        Context context = getApplicationContext();
-        Intent i = new Intent(context, serviceExtendedClass.class);
+        Intent i = new Intent(getApplicationContext(), serviceExtendedClass.class);
 
+        //TODO
+        //GET THESE TO WORK!!!!
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            Log.i("Info", "Called thing");
             startForegroundService(i);
         }
         else{
@@ -112,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
         r.run();
     }
 
-    @SuppressLint("MissingPermission")
     public void startTracking(){
         updateLastLoc();
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, (float) 0.5, locationListener);
