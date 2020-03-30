@@ -44,6 +44,7 @@
                 android:layout_height="wrap_content"
                 android:drawableLeft="@android:drawable/ic_menu_mylocation"
                 android:enabled="false"
+                android:onClick="startBroadcast"
                 android:text="@string/start_broadcast_btn_label" />
 
             <Button

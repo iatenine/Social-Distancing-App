@@ -40,6 +40,7 @@ public class serviceExtendedClass extends Service {
         return null;
     }
 
+
     public void aToast(String msg){
         Toast t = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
         t.show();
@@ -60,6 +61,23 @@ public class serviceExtendedClass extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                notificationIntent, 0);
+
+        Notification notification = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("Social Distancing Alerts")
+                .setContentText("A notification sound will play if any devices are detected at an unsafe distance")
+                .setContentIntent(pendingIntent).build();
+
+        startForeground(1337, notification);
+
+
+        Toast.makeText(this, "Hi there", Toast.LENGTH_SHORT).show();
+        Log.i("Info", "Got to service!!");
 
         messageListener = new MessageListener() {
             @Override
@@ -105,8 +123,6 @@ public class serviceExtendedClass extends Service {
                 .setContentIntent(pendingIntent)
                 .build();
         startForeground(1, notification);
-        //do heavy work on a background thread
-        //stopSelf();
         return START_STICKY;
     }
 

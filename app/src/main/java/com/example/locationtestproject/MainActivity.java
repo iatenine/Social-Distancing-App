@@ -5,7 +5,9 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -13,7 +15,9 @@ import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -21,8 +25,10 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.messages.Message;
@@ -38,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     Location lastLoc;
     LocationManager locationManager;
     Message mActiveMessage;
+    Notification notification;
 
     Activity masterClass = this;
 
@@ -47,69 +54,23 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    public void buildNotification(){
-        Notification n = new Notification();
+    /*
+    * UI Functions
+    *
+    * */
+    public void startBroadcast(View view){
+        Context context = getApplicationContext();
+        Intent i = new Intent(context, serviceExtendedClass.class);
 
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            Log.i("Info", "Called thing");
+            startForegroundService(i);
+        }
+        else{
+            startService(i);
+        }
     }
 
-    MessageListener mMessageListener = new MessageListener(){
-        @Override
-        public void onFound(Message message){
-            String strMessage = message.toString();
-            String[] coords = strMessage.split("\\s+");
-            Location otherLoc = new Location(LocationManager.GPS_PROVIDER);
-            updateLastLoc();
-
-            double lat = Double.parseDouble(coords[0]);
-            double lon = Double.parseDouble(coords[1]);
-
-            otherLoc.setLatitude(Double.parseDouble(coords[0]));
-            otherLoc.setLongitude(Double.parseDouble(coords[1]));
-
-            double gap = lastLoc.distanceTo(otherLoc);
-            aToast("Distance of " + gap);
-        }
-    };
-
-    LocationListener locationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-
-            String lat = String.valueOf(location.getLatitude());
-            String lon = String.valueOf(location.getLongitude());
-
-            String comb = lat + " " + lon;
-            String[] gps_coords = comb.trim().split("\\s+");
-
-            Location newLoc = new Location(LocationManager.GPS_PROVIDER);
-            newLoc.setLatitude(Double.parseDouble(gps_coords[0]));
-            newLoc.setLongitude(Double.parseDouble(gps_coords[1]));
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-
-        }
-    };
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Nearby.getMessagesClient(this).unpublish(mActiveMessage);
-        Nearby.getMessagesClient(this).unsubscribe(mMessageListener);
-    }
-
-    //Enables or disable broadcasting based on user's agreement
     public void updateAgreement(View view){
         Button button = findViewById(R.id.btnBroadcastBegin);
         CheckBox cb = findViewById(R.id.checkBoxAgreement);
@@ -122,17 +83,12 @@ public class MainActivity extends AppCompatActivity {
         aToast("Cautious = " + boolCautious);
     }
 
-    public void playTone(){
-        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        MediaPlayer mp = MediaPlayer.create(getApplicationContext(), notification);
-        mp.start();
-    }
-
     public void aToast(String msg){
         Toast t = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
         t.show();
     }
 
+    /*
     public void requestTracking(){
         Runnable r = new Runnable() {
             @Override
@@ -149,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
                     else{
 
                     }
-
                 startTracking();
             }
         };
@@ -159,12 +114,10 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("MissingPermission")
     public void startTracking(){
-        aToast("Tracking begins");
         updateLastLoc();
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, (float) 0.5, locationListener);
     }
 
-    @SuppressLint("MissingPermission")
     public void updateLastLoc(){
         lastLoc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
     }
@@ -173,5 +126,5 @@ public class MainActivity extends AppCompatActivity {
         mActiveMessage = new Message(message.getBytes());
         Nearby.getMessagesClient(this).publish(mActiveMessage);
     }
-
+     */
 }
