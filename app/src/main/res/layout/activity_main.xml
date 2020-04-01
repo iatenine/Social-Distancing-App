@@ -53,6 +53,7 @@
                 android:layout_height="wrap_content"
                 android:drawableLeft="@android:drawable/ic_delete"
                 android:enabled="true"
+                android:onClick="stopBroadcast"
                 android:text="@string/stop_broadcast_btn_label" />
         </LinearLayout>
     </ScrollView>
