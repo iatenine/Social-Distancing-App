@@ -20,7 +20,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="The following app has been designed as a simple tool to aid in social distancing for the COVID-19 crisis.\nPlease keep in mind that it will broadcast your GPS location to all nearby devices while running, display a foreground message and begin playing an alert if another device has indicated it is approaching a certain threshold deemed unsafe by social distancing standards.\n     Please DO NOT click the button below if broadcasting location information could constitute a threat to anybody's personal safety or security  "
-                android:textSize="18sp" />
+                android:textSize="14sp" />
 
             <CheckBox
                 android:id="@+id/checkBoxAgreement"
