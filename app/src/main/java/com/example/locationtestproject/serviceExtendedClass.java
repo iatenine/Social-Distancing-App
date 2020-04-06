@@ -56,7 +56,7 @@ public class serviceExtendedClass extends Service {
 
         notification = new NotificationCompat.Builder(getBaseContext(), CHANNEL_ID)
                 .setContentTitle("Social Distancing Scanner")
-                .setContentText("Text herejrklajflk ")
+                .setContentText("You are currently broadcasting your message. We will play an alert sound if you come with an unsafe threshold of another person running another compatible social distancing app")
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentIntent(pendingIntent)
                 .build();
