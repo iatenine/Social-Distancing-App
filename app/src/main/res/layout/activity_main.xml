@@ -19,8 +19,8 @@
                 android:id="@+id/textView5"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text="The following app has been designed as a simple tool to aid in social distancing for the COVID-19 crisis.\nPlease keep in mind that it will broadcast your GPS location to all nearby devices while running, display a foreground message and begin playing an alert if another device has indicated it is approaching a certain threshold deemed unsafe by social distancing standards.\n     Please DO NOT click the button below if broadcasting location information could constitute a threat to anybody's personal safety or security  "
-                android:textSize="14sp" />
+                android:text="@string/disclaimer"
+                android:textSize="30sp" />
 
             <CheckBox
                 android:id="@+id/checkBoxAgreement"
@@ -36,12 +36,13 @@
                 android:layout_height="wrap_content"
                 android:checked="true"
                 android:onClick="flipCautious"
-                android:text="High Frequency Updates (recommended but uses more battery)" />
+                android:text="@string/frequency_toggle_label" />
 
             <Button
                 android:id="@+id/btnBroadcastBegin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:drawableStart="@android:drawable/ic_menu_mylocation"
                 android:drawableLeft="@android:drawable/ic_menu_mylocation"
                 android:enabled="false"
                 android:onClick="startBroadcast"
@@ -51,6 +52,7 @@
                 android:id="@+id/btnBroadcastStop"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:drawableStart="@android:drawable/ic_delete"
                 android:drawableLeft="@android:drawable/ic_delete"
                 android:enabled="true"
                 android:onClick="stopBroadcast"

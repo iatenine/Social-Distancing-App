@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">LocationTestProject</string>
-    <string name="agreement_checkbox">I have read to the above statement and agree broadcasting my location does not impose a serious security or safety threat</string>
+    <string name="agreement_checkbox">I agree broadcasting my location does not impose a serious security or safety threat</string>
     <string name="start_broadcast_btn_label">Start Broadcasting</string>
     <string name="stop_broadcast_btn_label">Stop Broadcasting</string>
+    <string name="frequency_toggle_label">High Frequency Updates (recommended but uses more battery)</string>
+    <string name="disclaimer">This app is designed to assist in social distancing measures only and works by broadcasting your location unencrypted to nearby devices running compatible apps\n\nDo not begin broadcasting if doing so would in any way compromise the safety or security of anybody</string>
 </resources>
