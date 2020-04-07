@@ -1,21 +1,26 @@
 package com.example.locationtestproject;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 public class serviceExtendedClass extends Service {
-    public static final String CHANNEL_ID = "ForegroundServiceChannel";
+    public static final String CHANNEL_ID = "COVID SD";
     public static final int NOT_ID = 6450;
     private static final String TAG = "Service Logger";
 
     private Notification notification;
+    private NotificationChannel notificationChannel;
 
 
     @Nullable
@@ -53,10 +58,16 @@ public class serviceExtendedClass extends Service {
         Intent serviceIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, serviceIntent, 0);
 
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            notificationChannel = new NotificationChannel(CHANNEL_ID, "SD Scanner", NotificationManager.IMPORTANCE_HIGH);
+                notificationChannel.setDescription("Broadcasting location and scanning for nearby messages");
+                NotificationManager notificationManager = getSystemService(NotificationManager.class);
+                notificationManager.createNotificationChannel(notificationChannel);
+        }
 
-        notification = new NotificationCompat.Builder(getBaseContext(), CHANNEL_ID)
+        notification = new androidx.core.app.NotificationCompat.Builder(getBaseContext(), CHANNEL_ID)
                 .setContentTitle("Social Distancing Scanner")
-                .setContentText("You are currently broadcasting your message. We will play an alert sound if you come with an unsafe threshold of another person running another compatible social distancing app")
+                .setContentText("You are currently broadcasting your message")
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentIntent(pendingIntent)
                 .build();

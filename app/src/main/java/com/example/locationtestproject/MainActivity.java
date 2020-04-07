@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private LocationManager locationManager;
     private LocationListener locationListener;
     private Location lastLoc;
+    private Location nearestLoc;
 
     final float THRESHOLD = 3;  //Meters at which alarm should begin playing
     final int FREQUENT_UDPATES = 1000;
