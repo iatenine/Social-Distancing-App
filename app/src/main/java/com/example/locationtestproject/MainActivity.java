@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.location.LocationManagerCompat;
 
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.messages.Message;
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private Location lastLoc;
     private Location nearestLoc;
 
-    final float THRESHOLD = 3;  //Meters at which alarm should begin playing
+    final float THRESHOLD = (float) 3;  //Meters at which alarm should begin playing
     final int FREQUENT_UDPATES = 1000;
     final int BATTERY_SAVER = 5000;
     Intent i;
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mp = MediaPlayer.create(getApplicationContext(), notification);
         i = new Intent(getApplicationContext(), serviceExtendedClass.class);
+        nearestLoc = getNullLoc();
     }
 
     @Override
@@ -73,6 +75,31 @@ public class MainActivity extends AppCompatActivity {
 
     private String constructLocString(Location l) {
         String ret = STANDARD + " " + String.valueOf(l.getLatitude()) + " " + String.valueOf(l.getLongitude());
+        return ret;
+    }
+
+    private Location parseLocFromMessage(Message m){
+        String msg_str = new String(m.getContent());
+        String[] s = msg_str.split("\\s+");
+
+        Log.d(TAG, "parseLocFromMessage: " + msg_str);
+        String[] coords = msg_str.toString().split("\\s+");
+
+        Location thisLoc = getNullLoc();
+
+        if (isValidMsg(m) == true) {
+            Log.d(TAG, "parseLocFromMessage: Str recognized as valid");
+            thisLoc.setLatitude(Double.parseDouble(coords[1]));
+            thisLoc.setLongitude(Double.parseDouble(coords[2]));
+        }
+
+        return thisLoc;
+    }
+
+    private Location getNullLoc(){
+        Location ret = new Location(LocationManager.GPS_PROVIDER);
+        ret.setLatitude(0);
+        ret.setLongitude(0);
         return ret;
     }
 
@@ -100,23 +127,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Math/parsing functions
-    private boolean isValidMsg(String[] s) {
-        if (s.length == 3 && s[0].compareTo(STANDARD) == 0)
+    private boolean isValidMsg(Message msg) {
+        String msg_str = new String(msg.getContent());
+        String[] s = msg_str.split("\\s+");
+        if (s[0].compareTo(STANDARD) == 0)
             return true;
         else
             return false;
     }
 
-    public double getDistToMsg(Message message) {
-        String[] coords = message.toString().split("\\s+");
-        if (isValidMsg(coords) == false)
-            return 999999;
-        Location otherLoc = new Location(LocationManager.GPS_PROVIDER);
-        //Lat + Lon
-        otherLoc.setLatitude(Double.parseDouble(coords[1]));
-        otherLoc.setLongitude(Double.parseDouble(coords[2]));
-
-        return lastLoc.distanceTo(otherLoc);
+    public double getDistToMsg(Message m) {
+        return lastLoc.distanceTo(parseLocFromMessage(m));
     }
 
     public void broadcastMessage() {
@@ -124,35 +145,56 @@ public class MainActivity extends AppCompatActivity {
             Nearby.getMessagesClient(this).publish(message);
     }
 
+    public void removeLoc(Message m){
+        Location queryLoc = parseLocFromMessage(m);
+        if(nearestLoc == queryLoc)
+            nearestLoc = getNullLoc();
+    }
+
+    public void updateNearestLoc(Message msg){
+        Log.d(TAG, "updateNearestLoc: Nearest loc may become: " + new String(msg.getContent()));
+        if (getDistToMsg(msg) < lastLoc.distanceTo(nearestLoc)){
+            Log.d(TAG, "updateNearestLoc: Nearest loc accepted");
+                nearestLoc = parseLocFromMessage(msg);
+        }
+        Log.d(TAG, "updateNearestLoc: New nearest loc = " + nearestLoc.toString());
+        }
+
+
+    public void updateAlerts(){
+        Log.d(TAG, "updateAlerts: Threshold: " + String.valueOf(THRESHOLD));
+        Log.d(TAG, "updateAlerts: CurrLoc " + lastLoc.toString());
+        Log.d(TAG, "updateAlerts: nearLoc " + nearestLoc.toString());
+        Log.d(TAG, "updateAlerts: distanceto: " + String.valueOf(lastLoc.distanceTo(nearestLoc)));
+            if (lastLoc.distanceTo(nearestLoc) <= THRESHOLD) {
+                Log.d(TAG, "updateAlerts: Tone should play");
+                playTone();
+            } else {
+                Log.d(TAG, "updateAlerts: Tone should stop");
+                stopTone();
+            }
+        }
+
+
     //Override functions
     public void setUpNearby() {
         Log.d(TAG, "setUpNearby: Called");
         message = new Message("Init".getBytes());
         messageListener = new MessageListener() {
             @Override
-            public void onFound(Message message) {
-                String msg_str = new String(message.getContent());
-                Log.d(TAG, "Found message: " + new String(message.getContent()));
-                if (isValidMsg(msg_str.split("\\s+")) == true) {
-                    if (getDistToMsg(message) > THRESHOLD) {
-                        playTone();
-                        Log.d(TAG, "onFound: Too close!");
-                    } else {
-                        Log.d(TAG, "onFound: Far enough");
-                        stopTone();
-                    }
-                } else
-                    Log.d(TAG, "onFound: Invalid message");
+            public void onFound(Message m) {
+                Log.d(TAG, "Found message: " + new String(m.getContent()));
+                updateNearestLoc(m);
+                updateAlerts();
             }
 
             @Override
-            public void onLost(Message message) {
-                Log.d(TAG, "Lost sight of message: " + new String(message.getContent()));
-                stopTone();
+            public void onLost(Message m) {
+                Log.d(TAG, "Lost sight of message: " + new String(m.getContent()));
+                removeLoc(m);
+                updateAlerts();
             }
-
         };
-
         Nearby.getMessagesClient(this).subscribe(messageListener);
     }
 

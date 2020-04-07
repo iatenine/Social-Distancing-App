@@ -72,29 +72,4 @@ public class serviceExtendedClass extends Service {
                 .setContentIntent(pendingIntent)
                 .build();
     }
-
-    /*
-    public void playTone() {
-        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        MediaPlayer mp = MediaPlayer.create(getApplicationContext(), notification);
-        mp.start();
-    }
-
-     */
-    /*
-    //Returns distance in meters between current loc and provide lat/lon combo
-    public double getGapFromMessage (Message message) {
-        String[] coords = message.toString().split("\\s+");
-        Location otherLoc = new Location(LocationManager.GPS_PROVIDER);
-        updateLastLoc();    //Get most recent loc
-
-        //Lat + Lon
-        otherLoc.setLatitude(Double.parseDouble(coords[0]));
-        otherLoc.setLongitude(Double.parseDouble(coords[1]));
-
-        return lastLoc.distanceTo(otherLoc);
-    }
-
-     */
-
 }
