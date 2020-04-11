@@ -18,9 +18,9 @@ A simple app and standard to broadcast your phone's current location and play a 
  ## The "standard" message
   The project's standardized message's forumla is simply to publish a string with the following format: 
   
-  ```STD-COVID-SD <latitude> <longitude>>```
+  ```STD-COVID-SD <latitude> <longitude> <messages>>```
   
-  Where spaces can be used to parse the message into a 3 object array with STD-COVID-SD simply serving as a unique string to ensure the message was intended for another social distancing app and the other 2 items being used to compare against the current phone's location and play an alert if the threshold has been met
+  Where spaces can be used to parse the message into a 3+ object array with STD-COVID-SD simply serving as a unique string to ensure the message was intended for another social distancing app and the other 2 items being used to compare against the current phone's location and play an alert if the threshold has been met. Any strings after this are optional to help provide additional data. These will need to be standardized at a later date
 
 
 ## Privacy Protection
