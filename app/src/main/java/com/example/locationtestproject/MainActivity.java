@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -167,10 +168,10 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "updateAlerts: distanceto: " + lastLoc.distanceTo(nearestLoc));
             if (lastLoc.distanceTo(nearestLoc) <= THRESHOLD) {
                 Log.d(TAG, "updateAlerts: Tone should play");
-                playTone();
+                playAlertTone();
             } else {
                 Log.d(TAG, "updateAlerts: Tone should stop");
-                stopTone();
+                playClearTone();
             }
         }
 
@@ -259,12 +260,19 @@ public class MainActivity extends AppCompatActivity {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, BATTERY_SAVER, (float) 0.2, locationListener);
     }
 
-    public void playTone() {
+    public void playAlertTone() {
         alertPlayer.start();
+        aToast(R.string.nearby_alert);
     }
 
-    public void stopTone(){
+    public void playClearTone(){
         clearPlayer.start();
+        aToast(R.string.clear_notice);
+    }
+
+    public void aToast(int resID){
+        Toast toast = Toast.makeText(this, resID, Toast.LENGTH_LONG);
+        toast.show();
     }
 
 }
