@@ -10,6 +10,7 @@ import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -31,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "Main Logger";
     private static final String STANDARD = "STD-COVID-SD";
 
-    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-    MediaPlayer mp;
+    MediaPlayer alertPlayer;
+    MediaPlayer clearPlayer;
 
     private MessageListener messageListener;
     private Message message;
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private Location lastLoc;
     private Location nearestLoc;
 
-    final float THRESHOLD = (float) 3;  //Meters at which alarm should begin playing
+    final float THRESHOLD = (float) 15;  //Meters at which alarm should begin playing (roughly 12m margin of error)
     final int FREQUENT_UDPATES = 1000;
     final int BATTERY_SAVER = 5000;
     Intent i;
@@ -54,8 +55,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mp = MediaPlayer.create(getApplicationContext(), notification);
         i = new Intent(getApplicationContext(), serviceExtendedClass.class);
+        alertPlayer  = MediaPlayer.create(getApplicationContext(), R.raw.alert_tone);
+        clearPlayer = MediaPlayer.create(getApplicationContext(), R.raw.clear_tone);
+
         nearestLoc = getNullLoc();
     }
 
@@ -74,8 +77,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String constructLocString(Location l) {
-        String ret = STANDARD + " " + String.valueOf(l.getLatitude()) + " " + String.valueOf(l.getLongitude());
-        return ret;
+        return STANDARD + " " + l.getLatitude() + " " + l.getLongitude();
     }
 
     private Location parseLocFromMessage(Message m){
@@ -83,11 +85,11 @@ public class MainActivity extends AppCompatActivity {
         String[] s = msg_str.split("\\s+");
 
         Log.d(TAG, "parseLocFromMessage: " + msg_str);
-        String[] coords = msg_str.toString().split("\\s+");
+        String[] coords = msg_str.split("\\s+");
 
         Location thisLoc = getNullLoc();
 
-        if (isValidMsg(m) == true) {
+        if (isValidMsg(m)) {
             Log.d(TAG, "parseLocFromMessage: Str recognized as valid");
             thisLoc.setLatitude(Double.parseDouble(coords[1]));
             thisLoc.setLongitude(Double.parseDouble(coords[2]));
@@ -130,10 +132,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isValidMsg(Message msg) {
         String msg_str = new String(msg.getContent());
         String[] s = msg_str.split("\\s+");
-        if (s[0].compareTo(STANDARD) == 0)
-            return true;
-        else
-            return false;
+        return s[0].compareTo(STANDARD) == 0;
     }
 
     public double getDistToMsg(Message m) {
@@ -141,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void broadcastMessage() {
-        if (broadcasting == true)
+        if (broadcasting)
             Nearby.getMessagesClient(this).publish(message);
     }
 
@@ -162,10 +161,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void updateAlerts(){
-        Log.d(TAG, "updateAlerts: Threshold: " + String.valueOf(THRESHOLD));
+        Log.d(TAG, "updateAlerts: Threshold: " + THRESHOLD);
         Log.d(TAG, "updateAlerts: CurrLoc " + lastLoc.toString());
         Log.d(TAG, "updateAlerts: nearLoc " + nearestLoc.toString());
-        Log.d(TAG, "updateAlerts: distanceto: " + String.valueOf(lastLoc.distanceTo(nearestLoc)));
+        Log.d(TAG, "updateAlerts: distanceto: " + lastLoc.distanceTo(nearestLoc));
             if (lastLoc.distanceTo(nearestLoc) <= THRESHOLD) {
                 Log.d(TAG, "updateAlerts: Tone should play");
                 playTone();
@@ -254,19 +253,18 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
             return;
         }
-        if(boolCautious == true)
+        if(boolCautious)
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, FREQUENT_UDPATES, (float) 0.2, locationListener);
         else
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, BATTERY_SAVER, (float) 0.2, locationListener);
     }
 
     public void playTone() {
-        mp.setLooping(true);
-        mp.start();
+        alertPlayer.start();
     }
 
     public void stopTone(){
-        mp.stop();
+        clearPlayer.start();
     }
 
 }
